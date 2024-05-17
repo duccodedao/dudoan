@@ -115,13 +115,13 @@ h1 {
 
 @keyframes loadingAnimation {
     0% {
-        content: 'Loading.';
+        content: '🟢 Đang xổ 🟢';
     }
     50% {
-        content: 'Loading..';
+        content: '🔴🟢 Đang xổ🟢🔴';
     }
     100% {
-        content: 'Loading...';
+        content: '🟣🔴🟢 Đang xổ 🟢🔴🟣';
     }
 }
 
