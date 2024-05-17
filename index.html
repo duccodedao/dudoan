@@ -4,208 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dự đoán số ngẫu nhiên</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #ece9e6, #ffffff);
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        h1 {
-            color: #4CAF50;
-            margin-bottom: 20px;
-        }
-        #clock, #countdown {
-            font-size: 1.5em;
-            margin: 10px 0;
-            padding: 10px 20px;
-            border-radius: 5px;
-            background: #f0f0f0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .time-select, .session-input, .history-btn {
-            margin: 20px 0;
-        }
-        .time-select label, .session-input label {
-            font-size: 1.2em;
-            margin-right: 10px;
-        }
-        .time-select select, .session-input input {
-            padding: 10px;
-            font-size: 1em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .history-btn button {
-            padding: 10px 20px;
-            font-size: 1em;
-            border-radius: 5px;
-            border: none;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .history-btn button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            font-size: 2em;
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            width: 60%;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .history {
-            display: none;
-            font-size: 1em;
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            width: 80%;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .nhỏ, .lớn {
-            color: black;
-        }
-        .đỏ {
-            color: red;
-        }
-        .xanh {
-            color: green;
-        }
-        .violet {
-            color: violet;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <h1>Dự đoán số ngẫu nhiên</h1>
-    <p id="clock">Thời gian thực: --:--:--</p>
-    <div class="time-select">
-        <label for="interval">Chọn thời gian dự đoán: </label>
-        <select id="interval">
-            <option value="1">1 phút</option>
-            <option value="3">3 phút</option>
-            <option value="5">5 phút</option>
-            <option value="10">10 phút</option>
-        </select>
+    <div class="container">
+        <h1>Dự đoán số ngẫu nhiên</h1>
+        <div id="clock" class="clock">Thời gian thực: --:--:--</div>
+        <div id="countdown" class="clock">Đếm ngược: 60s</div>
+        <div class="select-wrapper">
+            <label for="interval">Chọn khoảng thời gian: </label>
+            <select id="interval">
+                <option value="1">1 phút</option>
+                <option value="3">3 phút</option>
+                <option value="5">5 phút</option>
+                <option value="10">10 phút</option>
+            </select>
+        </div>
+        <div class="session-input">
+            <label for="session">Nhập số phiên: </label>
+            <input type="number" id="session" value="2223" min="0">
+        </div>
+        <div class="history-btn">
+            <button onclick="toggleHistory()">Xem lịch sử</button>
+        </div>
+        <div class="loading" id="loading" style="display: none;"></div>
+        <div id="result"></div>
+        <div id="history" class="history"></div>
     </div>
-    <p id="countdown">Đếm ngược: --:--</p>
-    <div class="session-input">
-        <label for="session">Nhập số phiên: </label>
-        <input type="number" id="session" value="2223" min="0">
-    </div>
-    <div class="history-btn">
-        <button onclick="toggleHistory()">Xem lịch sử</button>
-    </div>
-    <p class="result" id="result">Chờ kết quả...</p>
-    <div class="history" id="history"></div>
-
-    <script>
-        let interval = 1; // Mặc định là 1 phút
-        let countdownTime = interval * 60; // Thời gian đếm ngược tính bằng giây
-        let history = [];
-
-        document.getElementById("interval").addEventListener("change", function() {
-            interval = parseInt(this.value);
-            countdownTime = interval * 60;
-        });
-
-        function getRandomNumber() {
-            return Math.floor(Math.random() * 10);
-        }
-
-        function getColorAndSize(number) {
-            let size = number <= 4 ? "Nhỏ" : "Lớn";
-            let color = "";
-
-            if (number === 0 || number === 5) {
-                color = "violet";
-            } else if (number % 2 === 0) {
-                color = "đỏ";
-            } else {
-                color = "xanh";
-            }
-
-            return { size, color };
-        }
-
-        function updateResult() {
-            let number = getRandomNumber();
-            let { size, color } = getColorAndSize(number);
-            
-            let resultElement = document.getElementById("result");
-            let sessionElement = document.getElementById("session");
-            let session = parseInt(sessionElement.value);
-
-            let resultText = `Phiên: ${session}, Số: ${number}, Loại: ${size}, Màu: ${color}`;
-            resultElement.textContent = resultText;
-            resultElement.className = `result ${size.toLowerCase()} ${color}`;
-
-            // Lưu kết quả vào lịch sử
-            history.push(resultText);
-            updateHistory();
-
-            // Tự động tăng số phiên
-            sessionElement.value = session + 1;
-        }
-
-        function updateHistory() {
-            let historyElement = document.getElementById("history");
-            historyElement.innerHTML = history.map(item => `<div>${item}</div>`).join('');
-        }
-
-        function toggleHistory() {
-            let historyElement = document.getElementById("history");
-            if (historyElement.style.display === "none" || historyElement.style.display === "") {
-                historyElement.style.display = "block";
-            } else {
-                historyElement.style.display = "none";
-            }
-        }
-
-        function updateClock() {
-            let now = new Date();
-            let hours = String(now.getHours()).padStart(2, '0');
-            let minutes = String(now.getMinutes()).padStart(2, '0');
-            let seconds = String(now.getSeconds()).padStart(2, '0');
-
-            document.getElementById("clock").textContent = `Thời gian thực: ${hours}:${minutes}:${seconds}`;
-        }
-
-        function updateCountdown() {
-            let now = new Date();
-            let totalSeconds = now.getMinutes() * 60 + now.getSeconds();
-            let remainingSeconds = (interval * 60) - (totalSeconds % (interval * 60));
-
-            let minutes = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
-            let seconds = String(remainingSeconds % 60).padStart(2, '0');
-            document.getElementById("countdown").textContent = `Đếm ngược: ${minutes}:${seconds}`;
-
-            if (remainingSeconds === 1) { // Dự đoán khi đếm ngược kết thúc
-                updateResult();
-            }
-        }
-
-        setInterval(function() {
-            updateClock();
-            updateCountdown();
-        }, 1000);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
