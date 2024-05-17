@@ -48,7 +48,7 @@ function updateResult() {
     // Hiển thị kết quả dưới dạng Swal.fire
     Swal.fire({
         title: 'Kết quả',
-        html: `Phiên: ${session}, Số: ${number}, Loại: ${size}, Màu: ${color}`,
+        html: `Kỳ sổ: ${session}, Số: ${number}, Loại: ${size}, Màu: ${color}`,
         icon: 'success',
         confirmButtonText: 'OK'
     }).then(() => {
@@ -88,7 +88,7 @@ function updateClock() {
     let minutes = String(now.getMinutes()).padStart(2, '0');
     let seconds = String(now.getSeconds()).padStart(2, '0');
 
-    document.getElementById("clock").textContent = `Thời gian thực: ${hours}:${minutes}:${seconds}`;
+    document.getElementById("clock").textContent = `Thời gian: ${hours}:${minutes}:${seconds}`;
 }
 
 function updateCountdown() {
