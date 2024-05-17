@@ -17,11 +17,11 @@ function getColorAndSize(number) {
     let color = "";
 
     if (number === 0 || number === 5) {
-        color = "violet";
+        color = "🟣🔴";
     } else if (number % 2 === 0) {
-        color = "đỏ";
+        color = "🔴";
     } else {
-        color = "xanh";
+        color = "🟢";
     }
 
     return { size, color };
