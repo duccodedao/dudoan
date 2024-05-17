@@ -34,13 +34,6 @@ function updateResult() {
     let sessionElement = document.getElementById("session");
     let session = parseInt(sessionElement.value);
 
-    let resultHTML = document.createElement("div");
-    resultHTML.textContent = `Phiên: ${session}, Số: ${number}, Loại: ${size}, Màu: ${color}`;
-    resultHTML.className = `result ${size.toLowerCase()} ${color}`;
-
-    // Thêm kết quả vào trong phần tử với ID là "result"
-    document.getElementById("result").appendChild(resultHTML);
-
     // Lưu vào lịch sử
     history.unshift({ session, number, size, color });
 
@@ -53,13 +46,16 @@ function updateResult() {
     // Hiển thị kết quả dưới dạng Swal.fire
     Swal.fire({
         title: 'Kết quả',
-        html: resultHTML.outerHTML, // Sử dụng outerHTML để chuyển đổi thành chuỗi HTML
+        html: `Phiên: ${session}, Số: ${number}, Loại: ${size}, Màu: ${color}`,
         icon: 'success',
         confirmButtonText: 'OK'
     }).then(() => {
         // Gọi lại hàm updateResult() để dự đoán phiên tiếp theo
         realtimeStarted = false; // Reset trạng thái để có thể bắt đầu lại
     });
+
+    // Cập nhật bảng lịch sử
+    renderHistory();
 }
 
 function toggleHistory() {
@@ -73,13 +69,14 @@ function toggleHistory() {
 }
 
 function renderHistory() {
-    let historyElement = document.getElementById("history");
-    historyElement.innerHTML = "";
+    let historyTableBody = document.getElementById("historyTable").getElementsByTagName("tbody")[0];
+    historyTableBody.innerHTML = "";
     history.forEach(entry => {
-        let entryElement = document.createElement("div");
-        entryElement.textContent = `Phiên: ${entry.session}, Số: ${entry.number}, Loại: ${entry.size}, Màu: ${entry.color}`;
-        entryElement.className = `history-entry ${entry.size.toLowerCase()} ${entry.color}`;
-        historyElement.appendChild(entryElement);
+        let row = historyTableBody.insertRow(0); // Thêm vào đầu bảng
+        row.insertCell(0).textContent = entry.session;
+        row.insertCell(1).textContent = entry.number;
+        row.insertCell(2).textContent = entry.size;
+        row.insertCell(3).textContent = entry.color;
     });
 }
 
@@ -95,9 +92,8 @@ function updateClock() {
 function updateCountdown() {
     let now = new Date();
     let seconds = now.getSeconds();
-    let countdown = 60 - seconds;
-
-    document.getElementById("countdown").textContent = `Đếm ngược: --:${countdown < 10 ? '0' : ''}${countdown}`;
+    let countdown = (countdownTime - seconds % countdownTime) % countdownTime;
+    document.getElementById("countdown").textContent = `Đếm ngược: ${countdown}s`;
 }
 
 setInterval(function() {
