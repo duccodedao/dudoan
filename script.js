@@ -16,10 +16,8 @@ function getColorAndSize(number) {
     let size = number <= 4 ? "Nhỏ" : "Lớn";
     let color = "";
 
-    if (number === 0) {
-        color = "🟣🔴";
-    if (number === 5) {
-        color = "🟣🟢";
+    if (number === 0 || number === 5) {
+        color = "🟣";
     } else if (number % 2 === 0) {
         color = "🔴";
     } else {
